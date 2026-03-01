@@ -1,0 +1,47 @@
+{
+  "bio": {
+    "name": "Sugat Dhawane",
+    "title": "Frontend Engineer",
+    "location": "Pune, India",
+    "summary": "Frontend engineer with 3+ years of experience building scalable web apps. Passionate about clean UI and developer experience.",
+    "email": "you@email.com",
+    "github": "https://github.com/yourusername",
+    "linkedin": "https://linkedin.com/in/yourusername"
+  },
+  "skills": [
+    "React", "Next.js", "TypeScript", "Tailwind CSS",
+    "Node.js", "REST APIs", "Git", "Figma"
+  ],
+  "experience": [
+    {
+      "company": "Company A",
+      "role": "Frontend Engineer",
+      "duration": "2022 - Present",
+      "description": "Built and maintained React-based dashboards serving 10k+ users. Led migration from JavaScript to TypeScript."
+    },
+    {
+      "company": "Company B",
+      "role": "Junior Frontend Developer",
+      "duration": "2021 - 2022",
+      "description": "Developed responsive UI components using React and Tailwind CSS."
+    }
+  ],
+  "projects": [
+    {
+      "name": "Project Alpha",
+      "description": "A real-time dashboard built with Next.js and WebSockets",
+      "stack": ["Next.js", "TypeScript", "WebSockets", "Tailwind"],
+      "link": "https://github.com/yourusername/project-alpha"
+    },
+    {
+      "name": "Project Beta",
+      "description": "E-commerce UI with cart and payment integration",
+      "stack": ["React", "Redux", "Stripe"],
+      "link": "https://github.com/yourusername/project-beta"
+    }
+  ],
+  "qualifications": [
+    "B.Sc. in Computer Science, University of Mumbai (2017-2021)",
+    "Certified React Developer, React Training (2022)"
+  ]
+}
