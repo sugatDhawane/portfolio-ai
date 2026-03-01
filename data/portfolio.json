@@ -1,47 +1,147 @@
 {
   "bio": {
     "name": "Sugat Dhawane",
-    "title": "Frontend Engineer",
-    "location": "Pune, India",
-    "summary": "Frontend engineer with 3+ years of experience building scalable web apps. Passionate about clean UI and developer experience.",
-    "email": "you@email.com",
-    "github": "https://github.com/yourusername",
-    "linkedin": "https://linkedin.com/in/yourusername"
+    "title": "Frontend Lead Engineer",
+    "location": "Pune, Maharashtra, India",
+    "phone": "+91-9833219332",
+    "email": "sugat.dhawane@gmail.com",
+    "linkedin": "https://linkedin.com/in/sugatdhawane",
+    "portfolio": "https://sugatdhawane.vercel.app",
+    "github": "https://github.com/sugatDhawane",
+    "summary": "Frontend Lead with 15+ years building enterprise-grade financial applications for PNC Bank and Charles Schwab. Deep expertise in Angular (v18+), React.js, TypeScript, and Micro-frontend Architecture, with a proven record of delivering scalable, accessible, and high-performance web applications in regulated fintech environments. Experienced in design system ownership, CI/CD automation, and cross-functional collaboration from requirements through production deployments."
   },
-  "skills": [
-    "React", "Next.js", "TypeScript", "Tailwind CSS",
-    "Node.js", "REST APIs", "Git", "Figma"
-  ],
+
+  "skills": {
+    "languages": ["HTML5", "CSS3", "JavaScript (ES6+)", "TypeScript"],
+    "frontend": ["Angular (v18+)", "React.js", "RxJS", "NgRx", "Stencil JS", "Webpack (Module Federation)", "Tailwind CSS", "Angular Material"],
+    "testing": ["Jest", "Jasmine", "Karma"],
+    "accessibility": ["WCAG 2.1", "JAWS", "Axe DevTools"],
+    "design": ["Figma"],
+    "devops": ["Azure DevOps (ADO)", "Jenkins", "SonarQube", "ESLint", "CI/CD"]
+  },
+
   "experience": [
     {
-      "company": "Company A",
-      "role": "Frontend Engineer",
-      "duration": "2022 - Present",
-      "description": "Built and maintained React-based dashboards serving 10k+ users. Led migration from JavaScript to TypeScript."
+      "company": "Mastech Digital",
+      "client": "PNC Bank",
+      "role": "Senior Software Engineer",
+      "location": "Dallas, TX, USA",
+      "duration": "Aug 2022 - Sep 2025",
+      "highlights": [
+        "Led frontend architecture for a Loan Processing Application, defining UI standards and driving technical decisions across a team of 5+ engineers.",
+        "Designed and delivered a Loan Processing Application using Angular, TypeScript, RxJS, and Kendo UI, reducing average loan processing time significantly.",
+        "Implemented Micro Frontend Architecture using Webpack's Module Federation across 7 independently deployable Angular projects, cutting release cycle time by ~40%.",
+        "Integrated REST APIs from backend .NET services to connect data and streamline workflow across loan processing modules.",
+        "Achieved 80% unit test coverage (Jasmine/Karma) and integrated SonarQube quality gates into CI/CD pipeline to automatically block regression.",
+        "Mentored 4 junior and mid-level developers in Angular, TypeScript, and testing best practices, reducing PR rework cycles by ~25%."
+      ]
     },
     {
-      "company": "Company B",
-      "role": "Junior Frontend Developer",
-      "duration": "2021 - 2022",
-      "description": "Developed responsive UI components using React and Tailwind CSS."
+      "company": "Mphasis Corp",
+      "client": "Charles Schwab",
+      "role": "Module Lead",
+      "location": "Dallas, TX, USA",
+      "duration": "May 2016 - Jul 2022",
+      "highlights": [
+        "Built and maintained 20+ reusable Web Components using Stencil JS, Angular, HTML, CSS, and JavaScript, enabling consistent UI patterns across product teams.",
+        "Contributed to the Schwab Design Library, delivering a component set that standardized accessibility implementation (WCAG 2.1).",
+        "Partnered with UX designers in Figma to translate wireframes into responsive, accessible components for the Statement and Reports project.",
+        "Developed React.js components for internal tooling, focusing on component modularity and backend API integration.",
+        "Received Summit Individual Awards twice for rapidly delivering proof-of-concepts alongside regular project commitments."
+      ]
+    },
+    {
+      "company": "Oracle",
+      "role": "Senior Web Application Developer",
+      "location": "Bengaluru, KA, India",
+      "duration": "Sep 2015 - Apr 2016",
+      "highlights": [
+        "Led creation of responsive web pages from initial drafts to final implementation using HTML, CSS, and JavaScript.",
+        "Ensured adherence to UX principles and WCAG accessibility standards.",
+        "Managed UI aspects of projects from design through ongoing maintenance and support."
+      ]
+    },
+    {
+      "company": "Cybage Software Pvt Ltd",
+      "role": "Senior Web Developer",
+      "location": "Pune, MH, India",
+      "duration": "Jan 2013 - Sep 2015",
+      "highlights": [
+        "Developed key features for an e-commerce platform using Angular, HTML, CSS, and Bootstrap.",
+        "Resolved cross-browser compatibility issues ensuring seamless functionality across all major browsers.",
+        "Delivered new features using ExtJS within a 3-week ramp-up period, meeting project deadlines."
+      ]
+    },
+    {
+      "company": "Early Career",
+      "role": "Software Engineer",
+      "location": "Mumbai, India",
+      "duration": "2008 - 2012",
+      "companies": ["SNSEPRO", "PiVisions", "Techno Infotech"],
+      "highlights": [
+        "Gained foundational experience in Web Development, PHP, and Software Delivery across three Mumbai-based firms."
+      ]
     }
   ],
+
   "projects": [
     {
-      "name": "Project Alpha",
-      "description": "A real-time dashboard built with Next.js and WebSockets",
-      "stack": ["Next.js", "TypeScript", "WebSockets", "Tailwind"],
-      "link": "https://github.com/yourusername/project-alpha"
+      "name": "Loan Processing Application",
+      "client": "PNC Bank",
+      "description": "Enterprise-grade loan processing platform handling end-to-end loan workflows for one of the largest US banks. Led frontend architecture and technical decisions for a team of 5+ engineers.",
+      "stack": ["Angular", "TypeScript", "RxJS", "Kendo UI", "REST APIs", ".NET integration"],
+      "highlights": ["Micro Frontend Architecture with Module Federation", "7 independently deployable Angular projects", "40% reduction in release cycle time", "80% unit test coverage"]
     },
     {
-      "name": "Project Beta",
-      "description": "E-commerce UI with cart and payment integration",
-      "stack": ["React", "Redux", "Stripe"],
-      "link": "https://github.com/yourusername/project-beta"
+      "name": "Schwab Design Library & Web Components",
+      "client": "Charles Schwab",
+      "description": "Built and maintained 20+ reusable Web Components as part of Charles Schwab's design system, enabling consistent UI patterns and accessibility standards across multiple product teams.",
+      "stack": ["Stencil JS", "Angular", "HTML", "CSS", "JavaScript", "WCAG 2.1"],
+      "highlights": ["20+ reusable components", "Standardized WCAG 2.1 accessibility", "Accelerated UI development across teams"]
+    },
+    {
+      "name": "Statement and Reports UI",
+      "client": "Charles Schwab",
+      "description": "Responsive, accessible UI for brokerage statement and reports, serving Charles Schwab's retail brokerage users. Translated Figma wireframes into production-ready components.",
+      "stack": ["Angular", "Figma", "HTML", "CSS", "WCAG 2.1"],
+      "highlights": ["Accessible brokerage UI", "Figma-to-code implementation", "JAWS screen reader support"]
+    },
+    {
+      "name": "E-commerce Platform",
+      "client": "Cybage Software",
+      "description": "Developed seller information pages and key features for an e-commerce platform with cross-browser compatibility.",
+      "stack": ["Angular", "HTML", "CSS", "Bootstrap", "ExtJS"],
+      "highlights": ["Cross-browser compatibility", "Delivered ExtJS features in 3-week ramp-up"]
     }
   ],
+
   "qualifications": [
-    "B.Sc. in Computer Science, University of Mumbai (2017-2021)",
-    "Certified React Developer, React Training (2022)"
-  ]
+    {
+      "degree": "Master of Computer Application (MCA)",
+      "university": "Pune University",
+      "location": "Pune, India",
+      "duration": "Jun 2005 - Jun 2009"
+    },
+    {
+      "degree": "Bachelor of Computer Science (BCS)",
+      "university": "Amravati University",
+      "location": "Amravati, India",
+      "duration": "Jul 2002 - Jun 2005"
+    }
+  ],
+
+  "awards": [
+    {
+      "title": "Summit Individual Award",
+      "issuer": "Charles Schwab via Mphasis",
+      "count": 2,
+      "reason": "Rapidly delivering proof-of-concepts alongside regular project commitments, demonstrating high productivity under competing priorities."
+    }
+  ],
+
+  "availability": {
+    "status": "Open to opportunities",
+    "type": ["Full-time", "Contract", "Remote"],
+    "notice": "Available to discuss immediately"
+  }
 }

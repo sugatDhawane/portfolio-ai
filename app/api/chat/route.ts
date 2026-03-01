@@ -15,24 +15,20 @@ const supabase = createClient(
 );
 
 // ── Rate Limiter ──────────────────────────────────────────
-// 10 requests per IP per minute
 const rateLimit = new Map<string, { count: number; reset: number }>();
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
   const limit = rateLimit.get(ip);
-
   if (limit && now < limit.reset) {
     if (limit.count >= 10) return false;
     limit.count++;
   } else {
     rateLimit.set(ip, { count: 1, reset: now + 60_000 });
   }
-
   return true;
 }
 
-// Clean up expired rate limit entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [ip, limit] of rateLimit.entries()) {
@@ -41,13 +37,10 @@ setInterval(() => {
 }, 5 * 60 * 1000);
 
 // ── Answer Cache ──────────────────────────────────────────
-// Cache answers for 24 hours — portfolio data rarely changes
 const answerCache = new Map<string, { answer: string; expires: number }>();
-const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
+const CACHE_TTL = 24 * 60 * 60 * 1000;
 
 function normalizeQuestion(question: string): string {
-  // Lowercase + trim + remove punctuation
-  // So "What are his skills?" and "what are his skills" both hit same cache key
   return question.toLowerCase().trim().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
 }
 
@@ -55,22 +48,15 @@ function getCachedAnswer(question: string): string | null {
   const key = normalizeQuestion(question);
   const cached = answerCache.get(key);
   if (!cached) return null;
-  if (Date.now() > cached.expires) {
-    answerCache.delete(key); // expired — remove it
-    return null;
-  }
+  if (Date.now() > cached.expires) { answerCache.delete(key); return null; }
   return cached.answer;
 }
 
 function setCachedAnswer(question: string, answer: string): void {
   const key = normalizeQuestion(question);
-  answerCache.set(key, {
-    answer,
-    expires: Date.now() + CACHE_TTL
-  });
+  answerCache.set(key, { answer, expires: Date.now() + CACHE_TTL });
 }
 
-// Clean up expired cache entries every hour
 setInterval(() => {
   const now = Date.now();
   for (const [key, value] of answerCache.entries()) {
@@ -86,38 +72,20 @@ function parseDevice(userAgent: string): string {
 }
 
 async function logVisitor({
-  req,
-  question,
-  answer,
-  fromCache = false,
+  req, question, answer, fromCache = false
 }: {
-  req: NextRequest;
-  question: string;
-  answer: string;
-  fromCache?: boolean;
+  req: NextRequest; question: string; answer: string; fromCache?: boolean;
 }) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
     const userAgent = req.headers.get("user-agent") ?? "unknown";
-
-    // Vercel auto-populates these headers on deployment
     const country = req.headers.get("x-vercel-ip-country") ?? "unknown";
     const city = req.headers.get("x-vercel-ip-city") ?? "unknown";
-
     const device = parseDevice(userAgent);
-
     await supabase.from("visitor_logs").insert({
-      ip,
-      country,
-      city,
-      user_agent: userAgent,
-      device,
-      question,
-      answer,
-      from_cache: fromCache, // useful to track cache hit rate
+      ip, country, city, user_agent: userAgent, device, question, answer, from_cache: fromCache
     });
   } catch (err) {
-    // Never let logging break the main response
     console.error("Logging error:", err);
   }
 }
@@ -135,22 +103,37 @@ const tools: Anthropic.Tool[] = [
   },
   {
     name: "get_skills",
-    description: "Get list of technical skills",
+    description: "Get technical skills grouped by category — languages, frontend, testing, devops",
     input_schema: { type: "object" as const, properties: {}, required: [] }
   },
   {
     name: "get_experience",
-    description: "Get work experience history",
+    description: "Get full work experience history",
     input_schema: { type: "object" as const, properties: {}, required: [] }
   },
   {
     name: "get_projects",
-    description: "Get list of projects",
+    description: "Get key projects with tech stack and highlights",
     input_schema: { type: "object" as const, properties: {}, required: [] }
   },
   {
     name: "get_qualifications",
-    description: "Get educational qualifications and certifications",
+    description: "Get educational qualifications",
+    input_schema: { type: "object" as const, properties: {}, required: [] }
+  },
+  {
+    name: "get_awards",
+    description: "Get awards and recognitions",
+    input_schema: { type: "object" as const, properties: {}, required: [] }
+  },
+  {
+    name: "get_availability",
+    description: "Get current job availability and work preferences",
+    input_schema: { type: "object" as const, properties: {}, required: [] }
+  },
+  {
+    name: "get_contact",
+    description: "Get contact details — email, phone, LinkedIn, GitHub",
     input_schema: { type: "object" as const, properties: {}, required: [] }
   },
   {
@@ -168,6 +151,15 @@ function handleToolCall(toolName: string): string {
     case "get_experience":     return JSON.stringify(portfolio.experience, null, 2);
     case "get_projects":       return JSON.stringify(portfolio.projects, null, 2);
     case "get_qualifications": return JSON.stringify(portfolio.qualifications, null, 2);
+    case "get_awards":         return JSON.stringify(portfolio.awards, null, 2);
+    case "get_availability":   return JSON.stringify(portfolio.availability, null, 2);
+    case "get_contact":        return JSON.stringify({
+      email: portfolio.bio.email,
+      phone: portfolio.bio.phone,
+      linkedin: portfolio.bio.linkedin,
+      github: portfolio.bio.github,
+      portfolio: portfolio.bio.portfolio
+    }, null, 2);
     case "get_all":            return JSON.stringify(portfolio, null, 2);
     default:                   return "Tool not found";
   }
@@ -175,7 +167,6 @@ function handleToolCall(toolName: string): string {
 
 // ── POST Handler ──────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  // 1. Rate limit check
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   if (!checkRateLimit(ip)) {
     return NextResponse.json(
@@ -186,50 +177,45 @@ export async function POST(req: NextRequest) {
 
   try {
     const { messages } = await req.json();
-
-    // 2. Trim to last 10 messages to control token usage
     const trimmedMessages = messages.slice(-10);
 
-    // 3. Get latest user question
     const latestQuestion = trimmedMessages
       .filter((m: { role: string }) => m.role === "user")
       .at(-1)?.content ?? "";
 
-    // 4. Check cache first — only for first message (not follow-ups in conversation)
-    const isFirstMessage = trimmedMessages.filter(
-      (m: { role: string }) => m.role === "user"
-    ).length === 1;
+    const isFirstMessage = trimmedMessages
+      .filter((m: { role: string }) => m.role === "user").length === 1;
 
+    // Cache check — only for standalone first questions
     if (isFirstMessage) {
       const cachedAnswer = getCachedAnswer(latestQuestion);
       if (cachedAnswer) {
-        // Cache hit — skip Claude entirely
         logVisitor({ req, question: latestQuestion, answer: cachedAnswer, fromCache: true });
         return NextResponse.json({ message: cachedAnswer });
       }
     }
 
-    // 5. First Claude call
+    // First Claude call
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
-      system: `You are a helpful assistant representing ${portfolio.bio.name}, a ${portfolio.bio.title}.
-Answer questions about them based on their portfolio data using the available tools.
-Only answer questions related to their work, skills, projects, and experience.
+      system: `You are a helpful assistant representing ${portfolio.bio.name}, a ${portfolio.bio.title} with ${new Date().getFullYear() - 2008}+ years of experience.
+Answer questions about him based on his portfolio data using the available tools.
+Only answer questions related to his work, skills, projects, experience, and background.
 Be conversational, friendly, and concise.
-Do not make up any information — only use data from the tools.`,
+Do not make up any information — only use data from the tools.
+When asked for contact info, provide it clearly and directly.`,
       tools,
       messages: trimmedMessages
     });
 
-    // 6. Handle tool use
+    // Handle tool use
     if (response.stop_reason === "tool_use") {
       const toolUseBlock = response.content.find(b => b.type === "tool_use");
 
       if (toolUseBlock && toolUseBlock.type === "tool_use") {
         const toolResult = handleToolCall(toolUseBlock.name);
 
-        // 7. Second Claude call with tool result
         const finalResponse = await client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 1024,
@@ -253,17 +239,14 @@ Be conversational, friendly, and concise. Do not make up any information.`,
         const textBlock = finalResponse.content.find(b => b.type === "text");
         const answer = textBlock?.type === "text" ? textBlock.text : "No response";
 
-        // 8. Cache the answer (only for single-turn questions)
         if (isFirstMessage) setCachedAnswer(latestQuestion, answer);
-
-        // 9. Log to Supabase
         logVisitor({ req, question: latestQuestion, answer, fromCache: false });
 
         return NextResponse.json({ message: answer });
       }
     }
 
-    // 10. Direct text response (no tool needed)
+    // Direct text response
     const textBlock = response.content.find(b => b.type === "text");
     const answer = textBlock?.type === "text" ? textBlock.text : "No response";
 
