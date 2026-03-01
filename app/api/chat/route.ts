@@ -71,6 +71,45 @@ function parseDevice(userAgent: string): string {
   return "Desktop";
 }
 
+// Geo cache — avoid repeated lookups for same IP
+const geoCache = new Map<string, { country: string; city: string }>();
+
+async function getGeoInfo(ip: string, req: NextRequest): Promise<{ country: string; city: string }> {
+  // 1. Return from geo cache if available
+  if (geoCache.has(ip)) return geoCache.get(ip)!;
+
+  // 2. Try Vercel headers first (fast, no extra request)
+  const vercelCountry = req.headers.get("x-vercel-ip-country");
+  const vercelCity = req.headers.get("x-vercel-ip-city");
+
+  if (vercelCountry && vercelCity && vercelCity !== "unknown") {
+    // Decode URL-encoded city names e.g. "San%20Francisco" → "San Francisco"
+    const geo = {
+      country: vercelCountry,
+      city: decodeURIComponent(vercelCity)
+    };
+    geoCache.set(ip, geo);
+    return geo;
+  }
+
+  // 3. Fallback to ip-api.com (free, no key needed, 1000 req/min)
+  try {
+    const res = await fetch(`http://ip-api.com/json/${ip}?fields=country,city,status`, {
+      signal: AbortSignal.timeout(2000) // 2 second timeout — never block main response
+    });
+    const data = await res.json();
+    if (data.status === "success") {
+      const geo = { country: data.country ?? "unknown", city: data.city ?? "unknown" };
+      geoCache.set(ip, geo);
+      return geo;
+    }
+  } catch {
+    // Silently fail — geo is nice to have, not critical
+  }
+
+  return { country: "unknown", city: "unknown" };
+}
+
 async function logVisitor({
   req, question, answer, fromCache = false
 }: {
@@ -79,9 +118,11 @@ async function logVisitor({
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
     const userAgent = req.headers.get("user-agent") ?? "unknown";
-    const country = req.headers.get("x-vercel-ip-country") ?? "unknown";
-    const city = req.headers.get("x-vercel-ip-city") ?? "unknown";
     const device = parseDevice(userAgent);
+
+    // Get geo — tries Vercel headers first, falls back to ip-api.com
+    const { country, city } = await getGeoInfo(ip, req);
+
     await supabase.from("visitor_logs").insert({
       ip, country, city, user_agent: userAgent, device, question, answer, from_cache: fromCache
     });
