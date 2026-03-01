@@ -15,6 +15,7 @@ const supabase = createClient(
 );
 
 // ── Rate Limiter ──────────────────────────────────────────
+// 10 requests per IP per minute
 const rateLimit = new Map<string, { count: number; reset: number }>();
 
 function checkRateLimit(ip: string): boolean {
@@ -31,12 +32,51 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
+// Clean up expired rate limit entries every 5 minutes
 setInterval(() => {
   const now = Date.now();
   for (const [ip, limit] of rateLimit.entries()) {
     if (now > limit.reset) rateLimit.delete(ip);
   }
 }, 5 * 60 * 1000);
+
+// ── Answer Cache ──────────────────────────────────────────
+// Cache answers for 24 hours — portfolio data rarely changes
+const answerCache = new Map<string, { answer: string; expires: number }>();
+const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 hours in ms
+
+function normalizeQuestion(question: string): string {
+  // Lowercase + trim + remove punctuation
+  // So "What are his skills?" and "what are his skills" both hit same cache key
+  return question.toLowerCase().trim().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
+}
+
+function getCachedAnswer(question: string): string | null {
+  const key = normalizeQuestion(question);
+  const cached = answerCache.get(key);
+  if (!cached) return null;
+  if (Date.now() > cached.expires) {
+    answerCache.delete(key); // expired — remove it
+    return null;
+  }
+  return cached.answer;
+}
+
+function setCachedAnswer(question: string, answer: string): void {
+  const key = normalizeQuestion(question);
+  answerCache.set(key, {
+    answer,
+    expires: Date.now() + CACHE_TTL
+  });
+}
+
+// Clean up expired cache entries every hour
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of answerCache.entries()) {
+    if (now > value.expires) answerCache.delete(key);
+  }
+}, 60 * 60 * 1000);
 
 // ── Visitor Logger ────────────────────────────────────────
 function parseDevice(userAgent: string): string {
@@ -49,16 +89,18 @@ async function logVisitor({
   req,
   question,
   answer,
+  fromCache = false,
 }: {
   req: NextRequest;
   question: string;
   answer: string;
+  fromCache?: boolean;
 }) {
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
     const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-    // Geo info from Vercel headers (auto-populated when deployed on Vercel)
+    // Vercel auto-populates these headers on deployment
     const country = req.headers.get("x-vercel-ip-country") ?? "unknown";
     const city = req.headers.get("x-vercel-ip-city") ?? "unknown";
 
@@ -72,9 +114,10 @@ async function logVisitor({
       device,
       question,
       answer,
+      from_cache: fromCache, // useful to track cache hit rate
     });
   } catch (err) {
-    // Log silently — never let analytics break the main response
+    // Never let logging break the main response
     console.error("Logging error:", err);
   }
 }
@@ -144,15 +187,29 @@ export async function POST(req: NextRequest) {
   try {
     const { messages } = await req.json();
 
-    // 2. Trim to last 10 messages
+    // 2. Trim to last 10 messages to control token usage
     const trimmedMessages = messages.slice(-10);
 
-    // 3. Get the latest user question for logging
+    // 3. Get latest user question
     const latestQuestion = trimmedMessages
       .filter((m: { role: string }) => m.role === "user")
       .at(-1)?.content ?? "";
 
-    // 4. First Claude call
+    // 4. Check cache first — only for first message (not follow-ups in conversation)
+    const isFirstMessage = trimmedMessages.filter(
+      (m: { role: string }) => m.role === "user"
+    ).length === 1;
+
+    if (isFirstMessage) {
+      const cachedAnswer = getCachedAnswer(latestQuestion);
+      if (cachedAnswer) {
+        // Cache hit — skip Claude entirely
+        logVisitor({ req, question: latestQuestion, answer: cachedAnswer, fromCache: true });
+        return NextResponse.json({ message: cachedAnswer });
+      }
+    }
+
+    // 5. First Claude call
     const response = await client.messages.create({
       model: "claude-sonnet-4-6",
       max_tokens: 1024,
@@ -165,14 +222,14 @@ Do not make up any information — only use data from the tools.`,
       messages: trimmedMessages
     });
 
-    // 5. Handle tool use
+    // 6. Handle tool use
     if (response.stop_reason === "tool_use") {
       const toolUseBlock = response.content.find(b => b.type === "tool_use");
 
       if (toolUseBlock && toolUseBlock.type === "tool_use") {
         const toolResult = handleToolCall(toolUseBlock.name);
 
-        // 6. Second Claude call with tool result
+        // 7. Second Claude call with tool result
         const finalResponse = await client.messages.create({
           model: "claude-sonnet-4-6",
           max_tokens: 1024,
@@ -196,19 +253,22 @@ Be conversational, friendly, and concise. Do not make up any information.`,
         const textBlock = finalResponse.content.find(b => b.type === "text");
         const answer = textBlock?.type === "text" ? textBlock.text : "No response";
 
-        // 7. Log to Supabase (fire and forget — don't await)
-        logVisitor({ req, question: latestQuestion, answer });
+        // 8. Cache the answer (only for single-turn questions)
+        if (isFirstMessage) setCachedAnswer(latestQuestion, answer);
+
+        // 9. Log to Supabase
+        logVisitor({ req, question: latestQuestion, answer, fromCache: false });
 
         return NextResponse.json({ message: answer });
       }
     }
 
-    // 8. Direct text response (no tool needed)
+    // 10. Direct text response (no tool needed)
     const textBlock = response.content.find(b => b.type === "text");
     const answer = textBlock?.type === "text" ? textBlock.text : "No response";
 
-    // 9. Log to Supabase (fire and forget)
-    logVisitor({ req, question: latestQuestion, answer });
+    if (isFirstMessage) setCachedAnswer(latestQuestion, answer);
+    logVisitor({ req, question: latestQuestion, answer, fromCache: false });
 
     return NextResponse.json({ message: answer });
 
