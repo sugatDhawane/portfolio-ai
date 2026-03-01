@@ -98,7 +98,7 @@ export default function Home() {
           background: var(--bg);
           color: var(--text);
           font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
+          font-size: 16px;
           height: 100%;
           overflow: hidden;
         }
@@ -215,7 +215,7 @@ export default function Home() {
           border: none;
           color: var(--text-muted);
           font-family: 'DM Sans', sans-serif;
-          font-size: 12.5px;
+          font-size: 13px;
           padding: 9px 10px;
           text-align: left;
           cursor: pointer;
@@ -257,6 +257,26 @@ export default function Home() {
           height: 100vh;
           overflow: hidden;
           background: var(--bg);
+        }
+
+        .main-footer {
+          padding: 10px 36px;
+          border-top: 1px solid var(--border);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+        }
+
+        .main-footer-text {
+          font-size: 11px;
+          color: var(--text-dim);
+          letter-spacing: 0.02em;
+        }
+
+        .main-footer-text span {
+          color: var(--orange-dark);
+          font-weight: 500;
         }
 
         .chat-header {
@@ -342,7 +362,7 @@ export default function Home() {
         }
 
         .empty-sub {
-          font-size: 13.5px;
+          font-size: 15px;
           color: var(--text-muted);
           max-width: 340px;
           line-height: 1.75;
@@ -361,7 +381,7 @@ export default function Home() {
           background: var(--surface-2);
           border: 1px solid var(--border-light);
           color: var(--text-muted);
-          font-size: 12px;
+          font-size: 13px;
           padding: 7px 14px;
           border-radius: 20px;
           cursor: pointer;
@@ -417,8 +437,8 @@ export default function Home() {
         .message-meta.assistant { color: var(--text-dim); }
 
         .message-bubble {
-          font-size: 14px;
-          line-height: 1.8;
+          font-size: 16px;
+          line-height: 1.85;
           white-space: pre-wrap;
         }
 
@@ -426,7 +446,7 @@ export default function Home() {
           color: var(--text);
           background: var(--surface-2);
           border: 1px solid var(--border-light);
-          padding: 12px 16px;
+          padding: 14px 18px;
           border-radius: 10px;
           align-self: flex-start;
           max-width: 88%;
@@ -436,10 +456,10 @@ export default function Home() {
         .message-bubble.assistant {
           color: #cec5b8;
           font-family: 'Lora', serif;
-          font-size: 14.5px;
-          padding-left: 16px;
+          font-size: 16px;
+          padding-left: 18px;
           border-left: 2px solid var(--orange-dark);
-          line-height: 1.85;
+          line-height: 1.9;
         }
 
         /* ── Thinking ── */
@@ -510,7 +530,7 @@ export default function Home() {
           outline: none;
           color: var(--text);
           font-family: 'DM Sans', sans-serif;
-          font-size: 14px;
+          font-size: 16px;
           padding: 14px 18px;
           font-weight: 400;
         }
@@ -522,7 +542,7 @@ export default function Home() {
           border: none;
           color: #f5e6d8;
           font-family: 'DM Sans', sans-serif;
-          font-size: 12.5px;
+          font-size: 14px;
           font-weight: 600;
           padding: 10px 20px;
           margin: 6px;
@@ -587,7 +607,6 @@ export default function Home() {
           </div>
 
           <div className="sidebar-footer">
-            Powered by <span>Claude AI</span>.<br />
             Answers based on real portfolio data.<br />
             Nothing is fabricated.
           </div>
@@ -675,6 +694,12 @@ export default function Home() {
             </div>
             <div className="input-hint">Press Enter to send</div>
           </div>
+
+          <footer className="main-footer">
+            <span className="main-footer-text">
+              © 2026 <span>Sugat Dhawane</span>. Crafted with precision.
+            </span>
+          </footer>
         </main>
       </div>
     </>
