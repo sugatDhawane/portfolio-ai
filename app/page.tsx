@@ -144,14 +144,14 @@ export default function Home() {
 
         .profile-name {
           font-family: 'Lora', serif;
-          font-size: 17px;
+          font-size: 20px;
           font-weight: 500;
           color: var(--text);
           letter-spacing: -0.01em;
         }
 
         .profile-role {
-          font-size: 12px;
+          font-size: 13px;
           color: var(--text-muted);
           font-weight: 400;
           margin-top: 1px;
@@ -269,9 +269,9 @@ export default function Home() {
         }
 
         .header-title {
-          font-size: 13px;
+          font-size: 20px;
           color: var(--text-muted);
-          font-weight: 400;
+          font-weight: 500;
           letter-spacing: 0.01em;
         }
 
@@ -561,7 +561,7 @@ export default function Home() {
           <div className="profile">
             <div className="profile-avatar">SD</div>
             <div className="profile-name">Sugat Dhawane</div>
-            <div className="profile-role">Frontend Engineer</div>
+            <div className="profile-role">Frontend Lead Engineer</div>
             <div className="availability">
               <div className="avail-dot" />
               <span className="avail-text">Open to opportunities</span>
