@@ -66,8 +66,7 @@ export default function Home() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Styrene+A:wght@300;400;500&family=Tiempos+Text:ital,wght@0,400;1,400&display=swap');
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
 
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -144,9 +143,9 @@ export default function Home() {
         }
 
         .profile-name {
-          font-family: 'Lora', serif;
-          font-size: 20px;
-          font-weight: 500;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 16px;
+          font-weight: 600;
           color: var(--text);
           letter-spacing: -0.01em;
         }
@@ -282,19 +281,12 @@ export default function Home() {
         }
 
         .chat-header {
-          padding: 18px 36px;
+          padding: 14px 36px;
           border-bottom: 1px solid var(--border);
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: flex-end;
           flex-shrink: 0;
-        }
-
-        .header-title {
-          font-size: 20px;
-          color: var(--text-muted);
-          font-weight: 500;
-          letter-spacing: 0.01em;
         }
 
         .header-badge {
@@ -311,6 +303,9 @@ export default function Home() {
         /* ── Empty state ── */
         .empty-state {
           flex: 1;
+          min-height: 0;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -318,6 +313,8 @@ export default function Home() {
           gap: 16px;
           padding: 60px 48px;
           text-align: center;
+          box-sizing: border-box;
+          width: 100%;
         }
 
         .empty-icon {
@@ -334,29 +331,29 @@ export default function Home() {
         }
 
         .empty-greeting {
-          font-family: 'Lora', serif;
-          font-style: italic;
-          font-size: 15px;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 500;
           color: var(--orange);
-          letter-spacing: 0.01em;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
           animation: fadeUp 0.4s ease;
         }
 
         .empty-tagline {
-          font-size: 13px;
+          font-size: 14px;
           color: var(--text-dim);
-          font-style: italic;
           max-width: 320px;
           line-height: 1.6;
           animation: fadeUp 0.5s ease;
         }
 
         .empty-title {
-          font-family: 'Lora', serif;
-          font-size: 26px;
-          font-weight: 500;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 32px;
+          font-weight: 600;
           color: var(--text);
-          letter-spacing: -0.02em;
+          letter-spacing: -0.03em;
         }
 
         .empty-title span {
@@ -370,39 +367,10 @@ export default function Home() {
           line-height: 1.75;
         }
 
-        .empty-chips {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          justify-content: center;
-          margin-top: 8px;
-          max-width: 440px;
-        }
-
-        .chip {
-          background: var(--surface-2);
-          border: 1px solid var(--border-light);
-          color: var(--text-muted);
-          font-size: 13px;
-          padding: 7px 14px;
-          border-radius: 20px;
-          cursor: pointer;
-          transition: all 0.13s ease;
-          font-family: 'DM Sans', sans-serif;
-          font-weight: 400;
-        }
-
-        .chip:hover:not(:disabled) {
-          border-color: var(--orange-border);
-          color: var(--orange);
-          background: var(--orange-pale);
-        }
-
-        .chip:disabled { opacity: 0.4; cursor: not-allowed; }
-
         /* ── Messages ── */
         .messages {
           flex: 1;
+          min-height: 0; /* critical — allows flex child to shrink below content size */
           overflow-y: auto;
           padding: 32px 36px;
           display: flex;
@@ -410,6 +378,7 @@ export default function Home() {
           gap: 28px;
           scrollbar-width: thin;
           scrollbar-color: var(--border-light) transparent;
+          -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
         }
 
         .messages::-webkit-scrollbar { width: 4px; }
@@ -457,7 +426,7 @@ export default function Home() {
 
         .message-bubble.assistant {
           color: #cec5b8;
-          font-family: 'Lora', serif;
+          font-family: 'DM Sans', sans-serif;
           font-size: 16px;
           padding-left: 18px;
           border-left: 2px solid var(--orange-dark);
@@ -578,16 +547,17 @@ export default function Home() {
 
         /* Landscape mobile fix */
         @media (max-height: 500px) and (orientation: landscape) {
-          .empty-state { padding: 20px; gap: 8px; }
-          .empty-icon { width: 36px; height: 36px; font-size: 18px; margin-bottom: 0; }
-          .empty-title { font-size: 20px; }
-          .empty-greeting { font-size: 13px; }
+          .empty-state { padding: 12px 20px; gap: 6px; justify-content: flex-start; padding-top: 16px; }
+          .empty-icon { width: 32px; height: 32px; font-size: 16px; margin-bottom: 0; }
+          .empty-title { font-size: 18px; }
+          .empty-greeting { font-size: 12px; }
+          .empty-tagline { font-size: 12px; }
           .empty-sub { display: none; }
           .empty-chips { margin-top: 4px; gap: 6px; }
           .chip { padding: 5px 10px; font-size: 12px; }
-          .chat-header { padding: 12px 20px; }
-          .input-area { padding: 10px 20px 14px; }
-          .messages { padding: 16px 20px; }
+          .chat-header { padding: 10px 20px; }
+          .input-area { padding: 8px 20px 10px; }
+          .messages { padding: 12px 20px; }
           .main-footer { display: none; }
         }
       `}</style>
@@ -632,7 +602,6 @@ export default function Home() {
         {/* Main */}
         <main className="main">
           <header className="chat-header">
-            <span className="header-title">Portfolio Assistant</span>
             <div className="header-badge">AI Powered</div>
           </header>
 
@@ -647,18 +616,6 @@ export default function Home() {
               <div className="empty-sub">
                 Ask me anything about my work, skills, or experience.
                 I answer based on real data — no fluff.
-              </div>
-              <div className="empty-chips">
-                {SUGGESTED_QUESTIONS.map((q) => (
-                  <button
-                    key={q}
-                    className="chip"
-                    onClick={() => sendMessage(q)}
-                    disabled={loading}
-                  >
-                    {q}
-                  </button>
-                ))}
               </div>
             </div>
           ) : (
