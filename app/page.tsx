@@ -100,13 +100,14 @@ export default function Home() {
           font-family: 'DM Sans', sans-serif;
           font-size: 16px;
           height: 100%;
-          overflow: hidden;
+          margin: 0;
         }
 
         .layout {
           display: grid;
           grid-template-columns: 260px 1fr;
           height: 100vh;
+          height: 100dvh;
           max-width: 1120px;
           margin: 0 auto;
         }
@@ -255,6 +256,7 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           height: 100vh;
+          height: 100dvh;
           overflow: hidden;
           background: var(--bg);
         }
@@ -572,6 +574,21 @@ export default function Home() {
           .layout { grid-template-columns: 1fr; }
           .sidebar { display: none; }
           .chat-header, .messages, .input-area { padding-left: 20px; padding-right: 20px; }
+        }
+
+        /* Landscape mobile fix */
+        @media (max-height: 500px) and (orientation: landscape) {
+          .empty-state { padding: 20px; gap: 8px; }
+          .empty-icon { width: 36px; height: 36px; font-size: 18px; margin-bottom: 0; }
+          .empty-title { font-size: 20px; }
+          .empty-greeting { font-size: 13px; }
+          .empty-sub { display: none; }
+          .empty-chips { margin-top: 4px; gap: 6px; }
+          .chip { padding: 5px 10px; font-size: 12px; }
+          .chat-header { padding: 12px 20px; }
+          .input-area { padding: 10px 20px 14px; }
+          .messages { padding: 16px 20px; }
+          .main-footer { display: none; }
         }
       `}</style>
 
